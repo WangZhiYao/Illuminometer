@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">照度计</string>
+
+    <string name="min">最小</string>
+    <string name="avg">平均</string>
+    <string name="max">最大</string>
+
+    <string name="error_sensor_not_find">未找到传感器</string>
+    <string name="error_get_sensor_data">获取传感器数据错误</string>
+
+</resources>
