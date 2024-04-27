@@ -12,6 +12,10 @@ $$
 E_v(fc) = E_v(lx) * 0.09290304
 $$
 
+## Screenshot
+
+<img src="screenshot/Screenshot_20240427_122945.png" width = "216" height = "480" alt="Detect" />
+
 ## Todo
 
 - [ ] detect record
