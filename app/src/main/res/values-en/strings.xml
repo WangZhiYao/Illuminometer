@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Illuminometer</string>
+
+    <string name="min">Min</string>
+    <string name="avg">Avg</string>
+    <string name="max">Max</string>
+
+    <string name="error_sensor_not_find">Sensor not find</string>
+    <string name="error_get_sensor_data">Can not get sensor data</string>
+</resources>
