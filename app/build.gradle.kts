@@ -1,8 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.sonarqube)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -32,6 +37,10 @@ android {
         }
     }
 
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -54,6 +63,26 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    ksp {
+        arg("room.generateKotlin", "true")
+    }
+}
+
+val sonarqubeProperties = Properties()
+sonarqubeProperties.load(FileInputStream(rootProject.file("sonarqube.properties")))
+
+sonar {
+    properties {
+        property("sonar.projectKey", sonarqubeProperties.getProperty("sonar.projectKey"))
+        property("sonar.projectName", sonarqubeProperties.getProperty("sonar.projectName"))
+        property("sonar.projectVersion", "${project.android.defaultConfig.versionName}")
+        property("sonar.host.url", sonarqubeProperties.getProperty("sonar.host.url"))
+        property("sonar.token", sonarqubeProperties.getProperty("sonar.token"))
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.sources", "src/main/kotlin")
+        property("sonar.tests", "src/test/kotlin")
+    }
 }
 
 dependencies {
@@ -69,17 +98,31 @@ dependencies {
 
     implementation(libs.bundles.kotlinx.coroutines)
 
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
+    // Orbit MVI
+    implementation(libs.bundles.orbit.mvi)
+
+    // Androidx
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraintlayout.compose)
 
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.androidx.compose)
+
+    // DataStore
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(libs.bundles.orbit.mvi)
+    // Room
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
+    ksp(libs.androidx.room.compiler)
+
+    // Paging
+    implementation(libs.bundles.paging)
 }

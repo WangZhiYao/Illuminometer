@@ -6,7 +6,8 @@ lights.
 
 Supports two light intensity units: Lux and FC(Foot Candles).
 
-The illuminance $E_v$ in foot candles (fc) is equal to the illuminance $E_v$ in lux (lx) times **0.09290304**:
+The illuminance $E_v$ in foot candles (fc) is equal to the illuminance $E_v$ in lux (lx) times *
+*0.09290304**:
 
 $$
 E_v(fc) = E_v(lx) * 0.09290304
@@ -14,11 +15,16 @@ $$
 
 ## Screenshot
 
-<img src="screenshot/Screenshot_20240427_122945.png" width = "216" height = "480" alt="Detect" />
+<div class="half" style="text-align: center;">
+    <img src="screenshot/Screenshot_20240502_113546.jpg" height = "600" alt="Detect" />
+    <img src="screenshot/Screenshot_20240502_113602.jpg" height = "600" alt="Add Record" />
+    <img src="screenshot/Screenshot_20240502_113610.jpg" height = "600" alt="Record List" />
+    <img src="screenshot/Screenshot_20240502_113625.jpg" height = "600" alt="Swipe to remove record" />
+</div>
 
 ## Todo
 
-- [ ] detect record
+- [x] detect record
 
 ## License
 

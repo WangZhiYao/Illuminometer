@@ -5,7 +5,27 @@
     <string name="avg">平均</string>
     <string name="max">最大</string>
 
-    <string name="error_sensor_not_find">未找到传感器</string>
-    <string name="error_get_sensor_data">获取传感器数据错误</string>
+    <string name="record">记录</string>
+    <string name="refresh_record">刷新记录</string>
+    <string name="remark">备注</string>
+    <string name="add_record_success">数据记录成功</string>
 
+    <string name="remove_all_record">清空所有记录</string>
+
+    <string name="dialog_title_tip">提示</string>
+    <string name="dialog_title_add_record">添加记录</string>
+    <string name="dialog_text_current_value">数值：%s</string>
+    <string name="dialog_text_current_unit">单位：%s</string>
+    <string name="dialog_text_current_time">时间：%s</string>
+    <string name="dialog_text_remove_current_detect_record">是否要删除当前记录</string>
+    <string name="dialog_text_remove_all_detect_record">是否要删除所有记录</string>
+
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="back">返回</string>
+
+    <string name="error_sensor_not_find">未找到传感器</string>
+    <string name="error_add_record">记录数据失败</string>
+    <string name="error_remove_record">删除数据失败</string>
+    <string name="error_remove_all_record">删除所有数据失败</string>
 </resources>

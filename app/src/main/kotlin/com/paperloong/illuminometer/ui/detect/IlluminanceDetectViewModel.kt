@@ -3,28 +3,30 @@ package com.paperloong.illuminometer.ui.detect
 import android.app.Application
 import android.hardware.Sensor
 import androidx.lifecycle.AndroidViewModel
-import com.paperloong.illuminometer.constant.Dispatcher
+import com.paperloong.illuminometer.R
 import com.paperloong.illuminometer.constant.IlluminanceUnit
-import com.paperloong.illuminometer.constant.IlluminometerDispatcher
+import com.paperloong.illuminometer.data.DetectRecordRepository
 import com.paperloong.illuminometer.data.SettingRepository
+import com.paperloong.illuminometer.di.qualifier.IODispatcher
 import com.paperloong.illuminometer.ext.luxToFc
 import com.paperloong.illuminometer.ext.sensorEventFlow
-import com.paperloong.illuminometer.model.SensorEventRecord
+import com.paperloong.illuminometer.model.DetectRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 /**
  *
@@ -36,7 +38,8 @@ import kotlin.math.roundToInt
 class IlluminanceDetectViewModel @Inject constructor(
     private val application: Application,
     private val settingRepository: SettingRepository,
-    @Dispatcher(IlluminometerDispatcher.IO) private val dispatcher: CoroutineDispatcher
+    private val detectRecordRepository: DetectRecordRepository,
+    @IODispatcher private val dispatcher: CoroutineDispatcher
 ) : ContainerHost<IlluminanceDetectUiState, IlluminanceDetectSideEffect>,
     AndroidViewModel(application) {
 
@@ -44,13 +47,12 @@ class IlluminanceDetectViewModel @Inject constructor(
         container(IlluminanceDetectUiState())
 
     private var currentJob: Job? = null
-    private val sensorEventRecordList: MutableList<SensorEventRecord> = mutableListOf()
+    private val detectRecordList: MutableList<DetectRecord> = mutableListOf()
 
     init {
         intent {
             settingRepository.getIlluminanceUnit()
-                .flowOn(dispatcher)
-                .onEach { sensorEventRecordList.clear() }
+                .onEach { detectRecordList.clear() }
                 .collect { unit ->
                     reduce {
                         IlluminanceDetectUiState(unit = unit)
@@ -64,26 +66,33 @@ class IlluminanceDetectViewModel @Inject constructor(
             sensorEventFlow(application, Sensor.TYPE_LIGHT)
                 .map { sensorEvent ->
                     val value = sensorEvent.values[0]
-                    when (state.unit) {
-                        IlluminanceUnit.LUX -> value
-                        IlluminanceUnit.FC -> value.luxToFc()
-                        null -> value
-                    }
+                    DetectRecord(
+                        value = when (state.unit) {
+                            IlluminanceUnit.LUX -> value
+                            IlluminanceUnit.FC -> value.luxToFc()
+                        },
+                        unit = state.unit
+                    )
                 }
                 .flowOn(dispatcher)
-                .onEach { value ->
-                    sensorEventRecordList.add(SensorEventRecord(value))
+                .onEach { detectRecord ->
+                    detectRecordList.add(detectRecord)
                 }
-                .collect { value ->
-                    val min = if (state.min.isBlank()) value else min(state.min.toFloat(), value)
-                    val avg = sensorEventRecordList.map { it.value }.average()
-                    val max = if (state.max.isBlank()) value else max(state.max.toFloat(), value)
+                .collect { detectRecord ->
+                    val min = if (state.initializedZero) detectRecord.value else min(
+                        state.min,
+                        detectRecord.value
+                    )
+                    val avg = detectRecordList.map { it.value }.average().toFloat()
+                    val max = max(state.max, detectRecord.value)
                     reduce {
                         state.copy(
-                            min = min.roundToInt().toString(),
-                            avg = avg.roundToInt().toString(),
-                            max = max.roundToInt().toString(),
-                            current = value.roundToInt().toString()
+                            min = min,
+                            avg = avg,
+                            max = max,
+                            current = detectRecord.value,
+                            time = detectRecord.createTime,
+                            initializedZero = false
                         )
                     }
                 }
@@ -100,6 +109,27 @@ class IlluminanceDetectViewModel @Inject constructor(
     fun setIlluminanceUnit(unit: IlluminanceUnit) {
         intent {
             settingRepository.setIlluminanceUnit(unit)
+        }
+    }
+
+    fun refreshData() {
+        intent {
+            reduce {
+                detectRecordList.clear()
+                IlluminanceDetectUiState(unit = state.unit)
+            }
+        }
+    }
+
+    fun attemptAddRecord(record: DetectRecord) {
+        intent {
+            detectRecordRepository.insertDetectRecord(record)
+                .catch {
+                    postSideEffect(Snack(application.getString(R.string.error_add_record)))
+                }
+                .collect {
+                    postSideEffect(Snack(application.getString(R.string.add_record_success)))
+                }
         }
     }
 }

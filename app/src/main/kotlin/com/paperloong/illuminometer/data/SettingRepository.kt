@@ -6,8 +6,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import com.paperloong.illuminometer.constant.IlluminanceUnit
 import com.paperloong.illuminometer.constant.KEY_ILLUMINANCE_UNIT
+import com.paperloong.illuminometer.di.qualifier.IODispatcher
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -18,12 +21,14 @@ import javax.inject.Inject
  * @since 2024/4/26
  */
 class SettingRepository @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    @IODispatcher private val dispatcher: CoroutineDispatcher
 ) {
 
     fun getIlluminanceUnit(): Flow<IlluminanceUnit> =
         get(KEY_ILLUMINANCE_UNIT, IlluminanceUnit.LUX.name)
             .map { name -> enumValueOf<IlluminanceUnit>(name) }
+            .flowOn(dispatcher)
 
     suspend fun setIlluminanceUnit(unit: IlluminanceUnit) {
         set(KEY_ILLUMINANCE_UNIT, unit.name)
