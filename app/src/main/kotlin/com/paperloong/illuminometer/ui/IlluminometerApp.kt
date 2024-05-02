@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.paperloong.illuminometer.ui.detect.IlluminanceDetectScreen
+import com.paperloong.illuminometer.ui.record.DetectRecordScreen
 
 /**
  *
@@ -26,7 +27,14 @@ fun IlluminometerNavHost(navController: NavHostController) {
     val snackbarHostState = remember { SnackbarHostState() }
     NavHost(navController = navController, startDestination = Screen.IlluminanceDetect.route) {
         composable(route = Screen.IlluminanceDetect.route) {
-            IlluminanceDetectScreen(snackbarHostState = snackbarHostState)
+            IlluminanceDetectScreen(
+                snackbarHostState = snackbarHostState,
+                navController = navController
+            )
+        }
+
+        composable(route = Screen.DetectRecord.route) {
+            DetectRecordScreen(snackbarHostState = snackbarHostState, navController = navController)
         }
     }
 }

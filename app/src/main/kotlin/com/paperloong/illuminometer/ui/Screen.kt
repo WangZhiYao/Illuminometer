@@ -15,4 +15,6 @@ sealed class Screen(
 
     data object IlluminanceDetect : Screen("detect")
 
+    data object DetectRecord : Screen("record")
+
 }

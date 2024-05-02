@@ -6,6 +6,28 @@
     <string name="avg">Avg</string>
     <string name="max">Max</string>
 
+    <string name="record">Record</string>
+    <string name="refresh_record">Refresh record</string>
+    <string name="remark">Remark</string>
+    <string name="add_record_success">Add record success</string>
+
+    <string name="remove_all_record">Remove all record</string>
+
+    <string name="dialog_title_tip">Tip</string>
+    <string name="dialog_title_add_record">Add record</string>
+    <string name="dialog_text_current_value">Value: %s</string>
+    <string name="dialog_text_current_unit">Unit: %s</string>
+    <string name="dialog_text_current_time">Time: %s</string>
+    <string name="dialog_text_remove_current_detect_record">Do you want to remove current detect record?</string>
+    <string name="dialog_text_remove_all_detect_record">Do you want to remove all detect records?</string>
+
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+
     <string name="error_sensor_not_find">Sensor not find</string>
-    <string name="error_get_sensor_data">Can not get sensor data</string>
+    <string name="error_add_record">Can not record the data</string>
+    <string name="error_remove_record">Can not remove the data</string>
+    <string name="error_remove_all_record">Can not remove all the data</string>
+
 </resources>
