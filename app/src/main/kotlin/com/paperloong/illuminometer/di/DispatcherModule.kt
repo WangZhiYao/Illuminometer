@@ -1,7 +1,6 @@
 package com.paperloong.illuminometer.di
 
-import com.paperloong.illuminometer.constant.Dispatcher
-import com.paperloong.illuminometer.constant.IlluminometerDispatcher
+import com.paperloong.illuminometer.di.qualifier.IODispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,11 +19,7 @@ import kotlinx.coroutines.Dispatchers
 object DispatcherModule {
 
     @Provides
-    @Dispatcher(IlluminometerDispatcher.IO)
+    @IODispatcher
     fun providerIODispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-    @Provides
-    @Dispatcher(IlluminometerDispatcher.DEFAULT)
-    fun providerDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
 }

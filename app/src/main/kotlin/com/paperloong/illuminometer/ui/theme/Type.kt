@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.sp
  * @author WangZhiYao
  * @since 2024/4/23
  */
-val Typography = Typography(
+val AppTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

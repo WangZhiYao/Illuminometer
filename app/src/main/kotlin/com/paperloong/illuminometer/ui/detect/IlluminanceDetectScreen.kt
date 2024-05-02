@@ -10,22 +10,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,10 +49,13 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.navigation.NavController
 import com.paperloong.illuminometer.R
 import com.paperloong.illuminometer.constant.IlluminanceUnit
+import com.paperloong.illuminometer.ext.formatToDateString
+import com.paperloong.illuminometer.model.DetectRecord
+import com.paperloong.illuminometer.ui.Screen
 import com.paperloong.illuminometer.ui.theme.IlluminanceTheme
-import com.paperloong.illuminometer.ui.theme.seed
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -51,7 +69,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun IlluminanceDetectScreen(
     viewModel: IlluminanceDetectViewModel = hiltViewModel(),
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    navController: NavController
 ) {
     LifecycleResumeEffect(lifecycleOwner = LocalLifecycleOwner.current) {
         viewModel.registerLightSensorEventListener()
@@ -72,24 +91,78 @@ fun IlluminanceDetectScreen(
         }
     }
 
+    var showAddRecordDialog by remember { mutableStateOf(false) }
+
     IlluminanceDetectContent(
         state,
         Modifier,
         snackbarHostState,
-        onUnitClick = { unit -> viewModel.setIlluminanceUnit(unit) }
+        onRefreshClick = { viewModel.refreshData() },
+        onRecordClick = { navController.navigate(Screen.DetectRecord.route) },
+        onUnitClick = { unit -> viewModel.setIlluminanceUnit(unit) },
+        onAddRecordClick = { showAddRecordDialog = true }
     )
+
+    if (showAddRecordDialog) {
+        AddRecordDialog(
+            state = state,
+            onConfirmClick = { detectRecord ->
+                showAddRecordDialog = false
+                viewModel.attemptAddRecord(detectRecord)
+            },
+            onDismissRequest = { showAddRecordDialog = false }
+        )
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IlluminanceDetectContent(
     state: IlluminanceDetectUiState,
-    modifier: Modifier,
-    snackbarHostState: SnackbarHostState,
-    onUnitClick: (IlluminanceUnit) -> Unit
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onRefreshClick: () -> Unit = {},
+    onRecordClick: () -> Unit = {},
+    onUnitClick: (IlluminanceUnit) -> Unit = {},
+    onAddRecordClick: () -> Unit = {}
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = stringResource(id = R.string.app_name)) },
+                modifier = modifier,
+                actions = {
+                    IconButton(onClick = onRefreshClick) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = stringResource(id = R.string.refresh_record)
+                        )
+                    }
+                    IconButton(onClick = onRecordClick) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_rounded_assignment_24dp),
+                            contentDescription = "Localized description"
+                        )
+                    }
+                },
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text(text = stringResource(id = R.string.record)) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = ""
+                    )
+                },
+                onClick = onAddRecordClick,
+                modifier = modifier
+            )
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         ConstraintLayout(
             modifier = modifier
@@ -99,21 +172,23 @@ fun IlluminanceDetectContent(
             val (valueCard, illuminance, unitGroup) = createRefs()
 
             ValueCardCombination(
-                state.min, state.avg, state.max,
+                state.unit.format(state.min),
+                state.unit.format(state.avg),
+                state.unit.format(state.max),
                 modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .constrainAs(valueCard) {
-                        top.linkTo(parent.top, margin = 32.dp)
+                        top.linkTo(parent.top, margin = 8.dp)
                     }
             )
 
-            Illuminance(state.current, state.unit,
+            Illuminance(
+                state.unit.format(state.current),
                 modifier.constrainAs(illuminance) {
-                    top.linkTo(parent.top)
+                    top.linkTo(valueCard.bottom, margin = 144.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
                 }
             )
 
@@ -121,7 +196,7 @@ fun IlluminanceDetectContent(
                 onUnitClick,
                 state.unit,
                 modifier.constrainAs(unitGroup) {
-                    top.linkTo(illuminance.bottom, margin = 32.dp)
+                    top.linkTo(illuminance.bottom, margin = 64.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -194,7 +269,7 @@ fun ValueCard(title: String, value: String, modifier: Modifier) {
 }
 
 @Composable
-fun Illuminance(value: String, unit: IlluminanceUnit?, modifier: Modifier) {
+fun Illuminance(value: String, modifier: Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
@@ -204,17 +279,6 @@ fun Illuminance(value: String, unit: IlluminanceUnit?, modifier: Modifier) {
             text = value,
             maxLines = 1,
             style = MaterialTheme.typography.headlineLarge
-        )
-        val name = if (unit == null) {
-            ""
-        } else {
-            "(${unit.name})"
-        }
-        Text(
-            text = name,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            style = MaterialTheme.typography.titleMedium
         )
     }
 }
@@ -229,16 +293,21 @@ fun IlluminanceUnitGroup(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        val selectedColor = MaterialTheme.colorScheme.primaryContainer
+
         FilledTonalButton(
             onClick = { onUnitClick(IlluminanceUnit.LUX) },
             modifier = Modifier
                 .width(128.dp)
                 .height(48.dp),
-            border = if (unit == IlluminanceUnit.LUX) BorderStroke(1.dp, seed) else null
+            border = if (unit == IlluminanceUnit.LUX) BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.primaryContainer
+            ) else null
         ) {
             Text(
                 text = IlluminanceUnit.LUX.name,
-                color = if (unit == IlluminanceUnit.LUX) seed else Color.Unspecified,
+                color = if (unit == IlluminanceUnit.LUX) selectedColor else Color.Unspecified,
                 style = MaterialTheme.typography.labelLarge
             )
         }
@@ -247,32 +316,91 @@ fun IlluminanceUnitGroup(
             modifier = Modifier
                 .width(128.dp)
                 .height(48.dp),
-            border = if (unit == IlluminanceUnit.FC) BorderStroke(1.dp, seed) else null
+            border = if (unit == IlluminanceUnit.FC) BorderStroke(
+                1.dp,
+                selectedColor
+            ) else null
         ) {
             Text(
                 text = IlluminanceUnit.FC.name,
-                color = if (unit == IlluminanceUnit.FC) seed else Color.Unspecified,
+                color = if (unit == IlluminanceUnit.FC) selectedColor else Color.Unspecified,
                 style = MaterialTheme.typography.labelLarge
             )
         }
     }
 }
 
+@Composable
+fun AddRecordDialog(
+    state: IlluminanceDetectUiState,
+    onConfirmClick: (DetectRecord) -> Unit,
+    onDismissRequest: () -> Unit = {}
+) {
+    val detectRecord by remember {
+        mutableStateOf(state.run {
+            DetectRecord(
+                value = current,
+                unit = unit,
+                createTime = time
+            )
+        })
+    }
+    var remark by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirmClick(detectRecord.copy(remark = remark))
+            }) {
+                Text(text = stringResource(id = R.string.confirm))
+            }
+        },
+        title = {
+            Text(text = stringResource(id = R.string.dialog_title_add_record))
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(
+                        id = R.string.dialog_text_current_value,
+                        detectRecord.unit.format(detectRecord.value)
+                    )
+                )
+                Text(
+                    text = stringResource(
+                        id = R.string.dialog_text_current_unit,
+                        detectRecord.unit
+                    ),
+                    modifier = Modifier.padding(vertical = 6.dp)
+                )
+                Text(
+                    text = stringResource(
+                        id = R.string.dialog_text_current_time,
+                        detectRecord.createTime.formatToDateString()
+                    )
+                )
+                OutlinedTextField(
+                    value = remark,
+                    onValueChange = { remark = it },
+                    modifier = Modifier.padding(top = 6.dp),
+                    label = { Text(text = stringResource(id = R.string.remark)) }
+                )
+            }
+        }
+    )
+}
+
 @Preview
 @Composable
 fun IlluminanceDetectScreenPreview() {
     IlluminanceTheme {
-        IlluminanceDetectContent(
-            IlluminanceDetectUiState(
-                "100",
-                "200",
-                "300",
-                "300",
-                IlluminanceUnit.LUX
-            ),
-            Modifier,
-            SnackbarHostState(),
-            onUnitClick = {}
+        val state = IlluminanceDetectUiState(
+            100f,
+            200f,
+            300f,
+            300f,
+            IlluminanceUnit.LUX
         )
+        IlluminanceDetectContent(state)
     }
 }

@@ -12,9 +12,18 @@ $$
 E_v(fc) = E_v(lx) * 0.09290304
 $$
 
+## Screenshot
+
+<div class="half" style="text-align: center;">
+    <img src="screenshot/Screenshot_20240502_113546.jpg" width="203" alt="Detect" />
+    <img src="screenshot/Screenshot_20240502_113602.jpg" width="203" alt="Add Record" />
+    <img src="screenshot/Screenshot_20240502_113610.jpg" width="203" alt="Record List" />
+    <img src="screenshot/Screenshot_20240502_113625.jpg" width="203" alt="Swipe to remove record" />
+</div>
+
 ## Todo
 
-- [ ] detect record
+- [x] Detect record
 
 ## License
 
