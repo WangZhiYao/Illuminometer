@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +55,6 @@ import com.paperloong.illuminometer.ext.formatToDateString
 import com.paperloong.illuminometer.model.DetectRecord
 import com.paperloong.illuminometer.ui.Screen
 import com.paperloong.illuminometer.ui.theme.IlluminanceTheme
-import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -79,14 +77,11 @@ fun IlluminanceDetectScreen(
         }
     }
 
-    val scope = rememberCoroutineScope()
     val state by viewModel.collectAsState()
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is Snack -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(sideEffect.message)
-                }
+                snackbarHostState.showSnackbar(sideEffect.message)
             }
         }
     }
