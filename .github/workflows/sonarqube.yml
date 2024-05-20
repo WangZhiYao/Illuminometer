@@ -3,6 +3,7 @@ name: SonarQube analysis
 on:
   push:
     branches: [ "master" ]
+    paths-ignore: [ "gradle/**" ]
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
