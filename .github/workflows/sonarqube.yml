@@ -33,4 +33,4 @@ jobs:
             -Dsonar.projectKey=Illuminometer
             -Dsonar.projectName=Illuminometer
             -Dsonar.sources=main/kotlin
-            -Dsonar.tests=test/kotlin
+            -Dsonar.tests=androidTest/kotlin,test/kotlin
