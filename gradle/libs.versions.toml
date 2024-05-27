@@ -5,9 +5,9 @@ junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 leakcanary = "2.14"
-kotlin = "1.9.24"
+kotlin = "2.0.0"
 kotlinxCoroutines = "1.8.1"
-ksp = "1.9.24-1.0.20"
+ksp = "2.0.0-1.0.21"
 hilt = "2.51.1"
 orbitMVI = "7.1.0"
 coreKtx = "1.13.1"
@@ -73,6 +73,7 @@ paging = ["androidx-paging-runtime", "androidx-paging-compose"]
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

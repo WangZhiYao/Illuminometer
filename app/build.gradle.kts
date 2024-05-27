@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
@@ -45,10 +46,6 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
-    buildFeatures {
-        compose = true
     }
 
     composeOptions {
