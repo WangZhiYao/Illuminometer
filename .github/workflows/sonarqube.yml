@@ -6,6 +6,7 @@ on:
     paths-ignore: [ "gradle/**" ]
   pull_request:
     branches: [ "master" ]
+    paths-ignore: [ "gradle/**" ]
   workflow_dispatch:
 
 permissions:
