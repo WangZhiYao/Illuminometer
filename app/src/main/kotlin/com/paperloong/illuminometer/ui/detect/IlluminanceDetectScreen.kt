@@ -70,7 +70,7 @@ fun IlluminanceDetectScreen(
     snackbarHostState: SnackbarHostState,
     navController: NavController
 ) {
-    LifecycleResumeEffect(lifecycleOwner = LocalLifecycleOwner.current) {
+    LifecycleResumeEffect(key1 = viewModel, lifecycleOwner = LocalLifecycleOwner.current) {
         viewModel.registerLightSensorEventListener()
         onPauseOrDispose {
             viewModel.unregisterLightSensorEventListener()
