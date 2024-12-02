@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.paperloong.illuminometer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.paperloong.illuminometer"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 2
         versionName = "2.0"
 
