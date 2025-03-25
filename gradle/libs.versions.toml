@@ -1,6 +1,6 @@
 [versions]
 android = "8.9.1"
-sonarqube = "6.0.1.5171"
+sonarqube = "6.1.0.5360"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
