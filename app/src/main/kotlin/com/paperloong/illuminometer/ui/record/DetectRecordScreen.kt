@@ -154,7 +154,7 @@ fun DetectRecordContent(
                 val item = detectRecordList[index] ?: return@items
                 DetectRecordItem(
                     detectRecord = item,
-                    modifier = modifier.animateItemPlacement(),
+                    modifier = modifier.animateItem(),
                     onConfirmClick = onConfirmClick
                 )
             }
