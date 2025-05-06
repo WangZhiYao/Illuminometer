@@ -1,5 +1,5 @@
 [versions]
-android = "8.9.2"
+android = "8.10.0"
 sonarqube = "6.1.0.5360"
 junit = "4.13.2"
 junitVersion = "1.2.1"
