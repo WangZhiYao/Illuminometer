@@ -18,7 +18,7 @@ composeBom = "2025.06.00"
 navigation = "2.9.0"
 hiltNavigation = "1.2.0"
 datastore = "1.1.7"
-room = "2.7.1"
+room = "2.7.2"
 paging = "3.3.6"
 
 [libraries]
