@@ -22,7 +22,7 @@ import javax.inject.Inject
  */
 class SettingRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    @param:IODispatcher private val dispatcher: CoroutineDispatcher
 ) {
 
     fun getIlluminanceUnit(): Flow<IlluminanceUnit> =

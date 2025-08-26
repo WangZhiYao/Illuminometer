@@ -36,7 +36,7 @@ class IlluminanceDetectViewModel @Inject constructor(
     private val application: Application,
     private val settingRepository: SettingRepository,
     private val detectRecordRepository: DetectRecordRepository,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    @param:IODispatcher private val dispatcher: CoroutineDispatcher
 ) : ContainerHost<IlluminanceDetectUiState, IlluminanceDetectSideEffect>,
     AndroidViewModel(application) {
 

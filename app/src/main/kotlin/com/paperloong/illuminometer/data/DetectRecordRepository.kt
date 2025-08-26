@@ -24,7 +24,7 @@ import javax.inject.Inject
 class DetectRecordRepository @Inject constructor(
     private val detectRecordDao: DetectRecordDao,
     private val detectRecordMapper: DetectRecordMapper,
-    @IODispatcher private val dispatcher: CoroutineDispatcher
+    @param:IODispatcher private val dispatcher: CoroutineDispatcher
 ) {
 
     fun insertDetectRecord(detectRecord: DetectRecord): Flow<DetectRecord> =
