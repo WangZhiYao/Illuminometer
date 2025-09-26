@@ -171,12 +171,7 @@ fun DetectRecordItem(
 ) {
     val scope = rememberCoroutineScope()
     var confirmDialogState by remember { mutableStateOf(false) }
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(confirmValueChange = { value ->
-        if (value == SwipeToDismissBoxValue.EndToStart) {
-            confirmDialogState = true
-        }
-        true
-    })
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
     SwipeToDismissBox(
         state = swipeToDismissBoxState,
         backgroundContent = {
@@ -185,7 +180,10 @@ fun DetectRecordItem(
                 modifier = modifier
             )
         },
-        enableDismissFromStartToEnd = false
+        enableDismissFromStartToEnd = false,
+        onDismiss = {
+            confirmDialogState = true
+        }
     ) {
         DetectRecordItemContent(
             detectRecord = detectRecord,
