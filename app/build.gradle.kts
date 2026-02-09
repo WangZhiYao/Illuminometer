@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.ksp)
@@ -37,9 +36,7 @@ android {
         }
     }
 
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -51,10 +48,14 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
 
-    ksp {
-        arg("room.generateKotlin", "true")
-    }
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+ksp {
+    arg("room.generateKotlin", "true")
 }
 
 kotlin {
